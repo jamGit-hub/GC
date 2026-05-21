@@ -1,16 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const orderControl = require('../controllers/orderControl');
-const { verifyToken } = require('../middleware/auth'); 
-
-//TESTINGG
-//console.log("=========================================");
-//console.log("DEBUG CHECK:");
-//console.log("1. verifyToken is:", typeof verifyToken, verifyToken);
-//console.log("2. orderControl.getOrders is:", typeof orderControl.getOrders, orderControl.getOrders);
-//console.log("=========================================");
+const { verifyToken, isAdmin } = require('../middleware/auth'); //verification middlewares 
 
 router.post('/checkout', orderControl.checkout);
-router.get('/:userId', verifyToken, orderControl.getOrders);
+router.get('/admin/orders', verifyToken, isAdmin, orderControl.getAllOrdersAdmin);// admins' path "they see them all" 
+router.get('/:userId', verifyToken, orderControl.getOrderHistory);//users' orders path
 
 module.exports = router;

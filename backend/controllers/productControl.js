@@ -57,3 +57,29 @@ exports.getProductsbyRegion = async (req, res) => {
       res.status(500).json({ message: 'Failed to add product', error: error.message });
     }
   };
+
+// Admin can update products. 
+  exports.updateProduct = async (req, res) => {
+    const { id } = req.params;
+    const { name, price, platform, region, image_url } = req.body;
+    try {
+      await db.query(
+        `UPDATE products SET name=?, price=?, platform=?, region=?, image_url=? 
+         WHERE id=?`,
+        [name, price, platform, region, image_url, id]
+      );
+      res.json({ message: "Product updated successfully" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+//And delete products
+  exports.deleteProduct = async (req, res) => {
+    const { id } = req.params;
+    try {
+      await db.query('DELETE FROM products WHERE id=?', [id]);
+      res.json({ message: "Product deleted" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };

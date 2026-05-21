@@ -13,5 +13,10 @@ router.get('/platform/:platform', productControl.getProductsbyPlatform);
  // rout for getting product by region , GET /api/products/region/:region
 router.get('/region/:region', productControl.getProductsbyRegion);
 
+
+//ADMIN ROUTS
 router.post('/add', verifyToken, isAdmin, productControl.addProduct); //secure POST route, MUST be logged in AND an admin to add products
+router.put('/:id',verifyToken, isAdmin, productControl.updateProduct);
+router.delete('/:id',verifyToken, isAdmin, productControl.deleteProduct)
+
 module.exports = router;
