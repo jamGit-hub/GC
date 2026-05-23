@@ -1,0 +1,43 @@
+.platform-card {
+  border: 1px solid #ddd;
+  padding: 20px;
+  text-align: center;
+  background: rgb(18, 18, 18);
+  cursor: pointer;
+  transition: 0.2s ease;
+  cursor: pointer;
+  width:170px;
+  height:150px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.platform-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  border-color: #FF9B51;
+}
+
+.product-card {
+  border: 1px solid #ddd;
+  padding: 20px;
+  text-align: center;
+  background: rgb(18, 18, 18);
+  cursor: pointer;
+  transition: 0.2s ease;
+  cursor: pointer;
+  width:170px;
+  height: 220px;;
+  border-radius: 20px;
+  text-align: center;
+align-content: center;
+
+        
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  border-color: #FF9B51;
+}
+
