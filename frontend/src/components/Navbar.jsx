@@ -39,7 +39,7 @@ import { Link, useNavigate } from 'react-router-dom';
             style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
             onClick={() => navigate("/")} >
             <img src="https://placehold.co/40x40" style={{ height: "30px" }} />
-            <h3 style={{ margin: 0 }}>GC Shop</h3>
+            <h3 style={{ margin: 0 }}>GC Store</h3>
         </div>
 
 

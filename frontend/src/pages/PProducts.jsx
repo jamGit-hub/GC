@@ -60,7 +60,7 @@ function PProducts() {
       >
         {products.map((p) => (
 
-  <div key={p.id} className="product-card">
+  <div key={p.id} className="product-card" style={{ height: "270px" }}>
     <PlatformLogo platform={p.platform} />
 
   

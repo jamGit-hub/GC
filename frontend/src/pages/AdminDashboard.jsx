@@ -146,7 +146,7 @@ function AdminDashboard() {
         {activeTab === "products" && ( 
             <div
             className="manageProductsTab" >
-            <h2>Products</h2>
+            <h2> Manage Products</h2>
 
             <div className="productsForm"
             style={{ marginBottom: "20px" }}>
@@ -203,9 +203,9 @@ function AdminDashboard() {
             <p>{message}</p>
 
             {products.map((p) => (
-                <div className="productsInAdminScreen"
+                <div className="productsInAdminScreen" 
                 
-                key={p.id} style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "10px" }}>
+                key={p.id} style={{borderRadius:"20px", border: "1px solid #ddd", padding: "20px", marginTop:"30px" ,marginLeft: "140px", marginRight:"140px"}}>
                    <PlatformLogo platform={p.platform} />
                 <h4>{p.name}</h4>
                 <p>{p.platform} - {p.region}</p>
@@ -222,12 +222,13 @@ function AdminDashboard() {
 
         {activeTab === "users" && (
             <div>
-            <h2>Users</h2>
+            <h2>Manage Users</h2>
 
             {users.length === 0 && <p>No users loaded yet</p>}
 
             {users.map((u) => (
-                <div key={u.id} style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "10px" }}>
+                <div className="usersInAdminScreen"  
+                key={u.id} style={{borderRadius:"20px", border: "1px solid #ddd", padding: "20px", marginTop:"30px" ,marginLeft: "140px", marginRight:"140px"}}>
                 <h4>{u.username}</h4>
                 <p>Role: {u.role}</p>
 

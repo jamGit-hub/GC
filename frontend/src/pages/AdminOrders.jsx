@@ -33,7 +33,7 @@ function AdminOrders() {
 
     return (
       <div style={{ padding: "20px" }}>
-        <h1>All Orders (Admin)</h1>
+        <h1>Orders</h1>
 
         {loading && <p>Loading orders...</p>}
 
@@ -41,38 +41,27 @@ function AdminOrders() {
           <p>No orders found</p>
         )}
 
-        <div style={{ display: "grid", gap: "15px", marginTop: "20px" }}>
+        <div style={{ display: "grid", gap: "15px", marginTop: "20px", margin: "140px"}}>
           {orders.map((order) => (
             <div
               key={order.id}
               style={{
                 border: "1px solid #ddd",
-                borderRadius: "10px",
-                padding: "15px",
-                background: "#fff",
-              }}
-            >
+                borderRadius: "20px",
+                background: "#333",
+                 padding:"40px" , textAlign:"left"
+              }} >
               <h3>Order #{order.id}</h3>
 
-              <p>
-                <b>User:</b> {order.email}
-              </p>
+              <p> User: {order.email}</p>
+              <p>User ID: {order.user_id} </p>
 
-              <p>
-                <b>User ID:</b> {order.user_id}
-              </p>
+              <p>Order Status: {order.status || "pending"} </p>
 
-              <p>
-                <b>Status:</b> {order.status || "pending"}
-              </p>
-              
-
-              <p>
-                <b>Total:</b> SAR {order.total_price}
-              </p>
+              <p>Total Price: SAR {order.total_price}</p>
 
               <p style={{ color: "#777" }}>
-                {new Date(order.created_at).toLocaleString()}
+               Order Placed on {new Date(order.order_date).toLocaleString()}
               </p>
 
                     <select value={order.status}

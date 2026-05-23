@@ -85,7 +85,7 @@ export default function Login() {
           disabled={loading}
           style={{ padding: '12px', background: '#FF9B51', color: '#1e1e2f', border: 'none', borderRadius: '4px', fontSize: '16px', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer', marginTop: '10px', transition: 'background 0.2s' }}
         >
-          {loading ? 'Authenticating...' : 'Sign In'}
+          {loading ? 'Authenticating...' : 'LogIn'}
         </button>
 
 

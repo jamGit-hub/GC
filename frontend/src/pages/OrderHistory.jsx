@@ -30,7 +30,7 @@ function OrderHistory(){
 
       return (
         <div style={{ padding: "20px" }}>
-          <h1>My Orders</h1>
+          <h1>Order History</h1>
     
           {orders?.length === 0 && <p>No orders yet</p>}
     
@@ -39,20 +39,22 @@ function OrderHistory(){
               key={order.id}
               style={{
                 border: "1px solid #ddd",
-                padding: "15px",
-                borderRadius: "10px",
+                padding: "30px",
+                borderRadius: "20px",
                 marginBottom: "15px",
+                marginTop: "40px", margin: "140px"
               }}
             >
               <h3>Order #{order.id}</h3>
               <p>Status: <b>{order.status}</b></p>
     
-              <div>
+              <div style ={{ textAlign:"left"}}>
                 {order.items?.map((item, i) => (
                   <div key={i}>
-                    • {item.product_name} — {item.quantity}x — SAR {item.price}
+                    {i}. {item.product_name} — {item.quantity}x — SAR {item.price}
                   </div>
                 ))}
+                <p>Total Price: SAR {order.total_price}</p>
               </div>
             </div>
           ))}

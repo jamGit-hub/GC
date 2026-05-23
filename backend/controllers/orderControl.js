@@ -82,41 +82,47 @@ exports.checkout = async (req, res) => {
       );
   
       const grouped = {};
-  
-      orders.forEach((row) => {
-        if (!grouped[row.id]) {
-          grouped[row.id] = {
-            id: row.id,
-            total_price: row.total_price,
-            items: [],
-          };
-        }
-  
-        if (row.product_name) {
-          grouped[row.id].items.push({
-            product_name: row.product_name,
-            quantity: row.quantity,
-            price: row.price,
-          });
-        }
-      });
-  
-      res.json(Object.values(grouped));
-    } catch (error) {
-      console.error("ORDER HISTORY ERROR:", error);
-      res.status(500).json({ error: error.message });
-    }
-  };
+
+    orders.forEach((row) => {
+      if (!grouped[row.id]) {
+        grouped[row.id] = {
+          id: row.id,
+          total_price: row.total_price,
+          status: row.status,
+          order_date: row.order_date,
+          items: [],
+        };
+      }
+
+      if (row.product_name) {
+        grouped[row.id].items.push({
+          product_name: row.product_name,
+          quantity: row.quantity,
+          price: row.price,
+        });
+      }
+    });
+
+    res.json(Object.values(grouped));
+  } catch (error) {
+    console.error("ORDER HISTORY ERROR:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
   exports.getAllOrdersAdmin = async (req, res) => {
     try {
       const [orders] = await db.query(`
         SELECT 
-          o.id,
-          o.user_id,
-          o.total_price,
-          o.status
+        o.id,
+        o.user_id,
+        u.email AS email,
+        o.total_price,
+        o.status,
+        o.order_date
+
         FROM orders o
-        ORDER BY o.id DESC
+        LEFT JOIN users u ON o.user_id = u.id
+        ORDER BY o.id DESC;
       `);
   
       res.status(200).json(orders);

@@ -59,7 +59,7 @@ function Cart() {
  return (
    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
 
-     <h1>Your Shopping Cart</h1>
+     <h1>Shopping Cart</h1>
 
      {cartItems.length === 0 ? <p>Your cart is empty.</p> : (
        // then when ur cart is not empty
@@ -77,7 +77,7 @@ function Cart() {
              {cartItems.map(item => ( // for each item to fill the table
                <tr key={item.id} style={{ borderBottom: '1px solid #ddd' }}>
                  <td style={{ padding: '10px' }}>{item.name}</td>
-                 <td>${item.price}</td>
+                 <td>SAR{item.price}</td>
                            
 
                    <td> 
