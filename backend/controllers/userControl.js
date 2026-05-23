@@ -77,15 +77,13 @@ exports.registerUser = async (req, res) => {
 
   exports.getAllUsers = async (req, res) => {
     try {
-        const [users] = await db.query(
-            `SELECT id, username, email, role, created_at 
-             FROM users 
-             ORDER BY created_at DESC`
-        );
-
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+      const [users] = await db.query(
+        "SELECT id, username, role FROM users"
+      );
+      res.json(users);
+    } catch (err) {
+      console.error("get AllUsers control ERROR:", err); 
+      res.status(500).json({ error: err.message });
     }
 };
 
@@ -116,9 +114,7 @@ exports.registerUser = async (req, res) => {
         'DELETE FROM users WHERE id = ?',
         [id]
       );
-
       res.json({ message: "User deleted" });
-
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

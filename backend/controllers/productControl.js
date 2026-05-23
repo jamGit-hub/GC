@@ -36,37 +36,34 @@ exports.getProductsbyRegion = async (req, res) => {
 
   // Adding products feature for mr admin dashboard
   exports.addProduct = async (req, res) => {
-    const { name, price, platform, region , image_url} = req.body;
+    try {
+      const { name, price, platform, region } = req.body;
+      console.log("ADDING PRODUCT:", req.body); //testing
   
-    //  server- side validation. no empty fields
-    if (!name || !price || !platform || !region) {
-      return res.status(400).json({ message: 'All fields (name, price, platform, region) are required.' });
-    }
-  
-    try { //goes to db
+      if (!name || !price || !platform || !region) {
+        return res.status(400).json({ error: "Missing fields" });
+      }
       const [result] = await db.query(
-        'INSERT INTO products (name, price, platform, region, image_url) VALUES (?, ?, ?, ?, ?)',
-        [name, price, platform, region, image_url]
+        "INSERT INTO products (name, price, platform, region) VALUES (?, ?, ?, ?)",
+        [name, price, platform, region]
       );
+      res.json({ success: true, id: result.insertId });
   
-      res.status(201).json({
-        message: 'Product added successfully!',
-        productId: result.insertId
-      });
-    } catch (error) {
-      res.status(500).json({ message: 'Failed to add product', error: error.message });
+    } catch (err) {
+      console.error("ADD PRODUCT ERROR:", err); //testing
+      res.status(500).json({ error: err.message });
     }
   };
 
 // Admin can update products. 
   exports.updateProduct = async (req, res) => {
     const { id } = req.params;
-    const { name, price, platform, region, image_url } = req.body;
+    const { name, price, platform, region} = req.body;
     try {
       await db.query(
-        `UPDATE products SET name=?, price=?, platform=?, region=?, image_url=? 
+        `UPDATE products SET name=?, price=?, platform=?, region=?
          WHERE id=?`,
-        [name, price, platform, region, image_url, id]
+        [name, price, platform, region, id]
       );
       res.json({ message: "Product updated successfully" });
     } catch (error) {

@@ -10,6 +10,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Cart from "./pages/Cart";
 import OrderHistory from './pages/OrderHistory';
 import PProducts from './pages/PProducts'
+import AdminOrders from "./pages/AdminOrders";
 function App() {
   return (
     <BrowserRouter>
@@ -23,6 +24,8 @@ function App() {
         <Route path="/Cart" element={<Cart />} />
         <Route path="/OrderHistory" element={<OrderHistory />} />
         <Route path="/platform/:name" element={<PProducts />} />
+        <Route path="/ViewOrders" element={<AdminOrders />} />
+
       </Routes>
     </BrowserRouter>
   );

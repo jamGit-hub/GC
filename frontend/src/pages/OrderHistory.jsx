@@ -7,32 +7,32 @@ function OrderHistory(){
     
 
       const [orders, setOrders] = useState([]);
-    
       const user = JSON.parse(localStorage.getItem("user"));
-    
        const activeId = user.id || user.user_id || user.userId;
-            
-  
+    
+      const fetchOrders = async () => {
+        try {
+          const user = JSON.parse(localStorage.getItem("user"));
+          if (!user?.id) return;
 
+          const data = await api.getOrderHistory(user.id);
+          console.log("ORDERS FROM API:", data);
+          setOrders(Array.isArray(data) ? data : []);
+
+        } catch (err) {
+          console.error(err);
+        }
+      }; 
 
       useEffect(() => {
         fetchOrders();
       }, []);
-    
-      const fetchOrders = async () => {
-        try {
-          const data = await api.getOrderHistory(user.id);
-          console.log("ORDERS FROM API:", data); 
-          setOrders(Array.isArray(data) ? data : []);
-        } catch (err) {
-          console.error(err);
-        }
-      };
+
       return (
         <div style={{ padding: "20px" }}>
           <h1>My Orders</h1>
     
-          {orders.length === 0 && <p>No orders yet</p>}
+          {orders?.length === 0 && <p>No orders yet</p>}
     
           {orders.map((order) => (
             <div

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../services/api";
+import PlatformLogo from "../components/platformLogos";
+
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("products");
@@ -8,7 +10,7 @@ function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
-  // product form
+  // product form variables 
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [platform, setPlatform] = useState("");
@@ -16,12 +18,18 @@ function AdminDashboard() {
 
   const [message, setMessage] = useState("");
 
-  // ---------------- FETCH DATA ----------------
+
   useEffect(() => {
     fetchProducts();
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    if (activeTab === "users") fetchUsers();
+    if (activeTab === "products") fetchProducts();
+  }, [activeTab]);
+
+ // recalled for refreshing page
   const fetchProducts = async () => {
     try {
       const data = await api.getProducts();
@@ -31,9 +39,11 @@ function AdminDashboard() {
     }
   };
 
+  // recalled for refreshing page
   const fetchUsers = async () => {
+    console.log("Calling getAllUsers...");
     try {
-      const data = await api.getUsers?.(); // if you have it
+      const data = await api.getAllUsers?.(); 
       setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
       console.log("No users API yet");
@@ -42,162 +52,203 @@ function AdminDashboard() {
 
   
 
-        const handleDeleteProduct = async (id) => {
-            const confirmDelete = window.confirm("Are you sure you want to delete this product?");
-        
+     const handleDeleteProduct = async (id) => {
+            const confirmDelete = window.confirm("Are you sure?");
             if (!confirmDelete) return;
         
             try {
-            await api.deleteProduct?.(id);
+            await api.deleteProduct(id); 
+            setMessage("Product deleted!");
             fetchProducts();
+            } catch (err) {
+            console.error(err);
+            setMessage("Delete failed");
+            }
+        };
+
+        const handleSaveProduct = async () => { //for both adding and update. cus we are using the same form. 
+            try {
+            if (editingId) {
+                await api.updateProduct(editingId, { //update call
+                name,
+                price: parseFloat(price),
+                platform,
+                region,
+                });
+                setMessage("Product updated!");
+            } else {
+                await api.addProduct({ name, price: parseFloat(price), platform, region }); //add or create new product call
+                setMessage("Product added!");
+            }
+        
+            resetForm();
+            fetchProducts();
+            } catch (err) {
+            setMessage("Operation failed");
+            }
+        };
+
+        //handling or amanging users 
+        const handleRoleChange = async (id, role) => {
+            try {
+            await api.updateUserRole(id, role);
+            fetchUsers();
             } catch (err) {
             console.log(err);
             }
         };
 
-  const handleSaveProduct = async () => {
-    try {
-      if (editingId) {
-        // UPDATE
-        await api.updateProduct(editingId, {
-          name,
-          price: parseFloat(price),
-          platform,
-          region,
-        });
-        setMessage("Product updated!");
-      } else {
-        // ADD
-        await api.addProduct({ name, price: parseFloat(price), platform, region });
-        setMessage("Product added!");
-      }
-  
-      resetForm();
-      fetchProducts();
-    } catch (err) {
-      setMessage("Operation failed");
-    }
-  };
+        const handleDeleteUser = async (id) => {
+            try {
+            await api.deleteUser(id);
+            fetchUsers();
+            } catch (err) {
+            console.log(err);
+            }
+        };
 
-  // ---------------- USER ACTIONS ----------------
-  const handleRoleChange = async (id, role) => {
-    try {
-      await api.updateUserRole?.(id, role);
-      fetchUsers();
-    } catch (err) {
-      console.log(err);
-    }
-  };
+        const startEdit = (p) => { //btn edit 
+            setEditingId(p.id);
+            setName(p.name);
+            setPrice(p.price);
+            setPlatform(p.platform);
+            setRegion(p.region);
+        };
 
-  const handleDeleteUser = async (id) => {
-    try {
-      await api.deleteUser?.(id);
-      fetchUsers();
-    } catch (err) {
-      console.log(err);
-    }
-  };
+        const resetForm = () => { //btn cancel
+            setEditingId(null);
+            setName("");
+            setPrice("");
+            setPlatform("");
+            setRegion("");
+        };
 
-  const startEdit = (p) => {
-    setEditingId(p.id);
-    setName(p.name);
-    setPrice(p.price);
-    setPlatform(p.platform);
-    setRegion(p.region);
-  };
 
-  const resetForm = () => {
-    setEditingId(null);
-    setName("");
-    setPrice("");
-    setPlatform("");
-    setRegion("");
-  };
+                        //UI
 
-  // ---------------- UI ----------------
-  return (
-    <div style={{ padding: "20px" }}>
-      <h1>Admin Dashboard</h1>
+    return (
+        <div style={{ padding: "20px" }}>
+        <h1>Admin Dashboard</h1>
 
-      {/* TABS */}
-      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-        <button onClick={() => setActiveTab("products")}>
-          Manage Products
-        </button>
-        <button onClick={() => setActiveTab("users")}>
-          Manage Users
-        </button>
-      </div>
+        <div 
+        className="adminManageTabs"
+        style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+            <button onClick={
+                () => setActiveTab("products")  //what u wanna manage tabs 
+            }> Manage Products
+            </button>
 
-      {/* ---------------- PRODUCTS ---------------- */}
-      {activeTab === "products" && (
-        <div>
-          <h2>Products</h2>
-
-          <div style={{ marginBottom: "20px" }}>
-            <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-            <input placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} />
-            <input placeholder="Platform" value={platform} onChange={(e) => setPlatform(e.target.value)} />
-            <input placeholder="Region" value={region} onChange={(e) => setRegion(e.target.value)} />
-
-            <button onClick={handleSaveProduct}>
-  {editingId ? "Update Product" : "Add Product"}
-</button>
-            {editingId && (
-  <button onClick={resetForm}>
-    Cancel
-  </button>
-)}
-          </div>
-
-          <p>{message}</p>
-
-          {/* PRODUCT LIST */}
-          {products.map((p) => (
-            <div key={p.id} style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "10px" }}>
-              <h4>{p.name}</h4>
-              <p>{p.platform} - {p.region}</p>
-              <p>SAR {p.price}</p>
-
-              <button onClick={() => handleDeleteProduct(p.id)}>
-                Delete
-              </button>
-              <button onClick={() => startEdit(p)}> Edit</button>
-            </div>
-          ))}
+            <button
+             onClick={() => setActiveTab("users")}>  Manage Users
+            </button>
         </div>
-      )}
 
-      {/* ---------------- USERS ---------------- */}
-      {activeTab === "users" && (
-        <div>
-          <h2>Users</h2>
+        {activeTab === "products" && ( 
+            <div
+            className="manageProductsTab" >
+            <h2>Products</h2>
 
-          {users.length === 0 && <p>No users loaded yet</p>}
+            <div className="productsForm"
+            style={{ marginBottom: "20px" }}>
+                <input className="productsField"
+                 placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
 
-          {users.map((u) => (
-            <div key={u.id} style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "10px" }}>
-              <h4>{u.username}</h4>
-              <p>Role: {u.role}</p>
+                <input className="productsField"
+                 placeholder="eg. 150.55" value={price} onChange={(e) => setPrice(e.target.value)} />
 
-              <button onClick={() => handleRoleChange(u.id, "admin")}>
-                Make Admin
-              </button>
+                <select value={platform} //platform dropdown
+       onChange={(e) => setPlatform(e.target.value)}
+       className="productsField"
+        style={{ padding: "6px",borderRadius: "6px", marginTop: "8px" }}>
+        <option value="">Select Platform</option>
+        <option value="PlayStation">PlayStation</option>
+        <option value="Netflix">Netflix</option>
+        <option value="Apple">Apple</option>
+        <option value="GooglePlay">Google Play</option>
+        <option value="Xbox">Xbox</option>
+        <option value="Steam">Steam</option>
+        <option value="Amazon">Amazon</option>
+        <option value="noon">noon</option>
+        <option value="Shahid">Shahid</option>
+        <option value="Huawei">Huawei</option>
+        
+      </select>
 
-              <button onClick={() => handleRoleChange(u.id, "user")}>
-                Make User
-              </button>
+            <select value={region} //region dropdown
+           onChange={(e) => setRegion(e.target.value)}
+           className="productsField"
+                style={{ padding: "6px",borderRadius: "6px", marginTop: "8px" }}>
+                <option value="">Select Region</option>
+                <option value="KSA">KSA</option>
+                <option value="USA">USA</option>
+                <option value="UAE">UAE</option>
+                <option value="UK">UK</option>
+                <option value="QATAR">QATAR</option>
+                <option value="BAHRAIN">BAHRAIN</option>
+                <option value="OMAN">OMAN</option>
+                <option value="EUROPE">EUROPE</option>
+                <option value="KUWAIT">KUWAIT</option>
+            </select>
 
-              <button onClick={() => handleDeleteUser(u.id)}>
-                Delete
-              </button>
+                <button onClick={handleSaveProduct}>
+    {editingId ? "Update Product" : "Add Product"}
+    </button>
+                {editingId && (
+    <button onClick={resetForm}>
+        Cancel
+    </button>
+    )}
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
-export default AdminDashboard;
+            <p>{message}</p>
+
+            {products.map((p) => (
+                <div className="productsInAdminScreen"
+                
+                key={p.id} style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "10px" }}>
+                   <PlatformLogo platform={p.platform} />
+                <h4>{p.name}</h4>
+                <p>{p.platform} - {p.region}</p>
+                <p>SAR {p.price}</p>
+
+                <button onClick={() => handleDeleteProduct(p.id)}>
+                    Delete
+                </button>
+                <button onClick={() => startEdit(p)}> Edit</button>
+                </div>
+            ))}
+            </div>
+        )}
+
+        {activeTab === "users" && (
+            <div>
+            <h2>Users</h2>
+
+            {users.length === 0 && <p>No users loaded yet</p>}
+
+            {users.map((u) => (
+                <div key={u.id} style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "10px" }}>
+                <h4>{u.username}</h4>
+                <p>Role: {u.role}</p>
+
+                <button onClick={() => handleRoleChange(u.id, "admin")}>
+                    Make Admin
+                </button>
+
+                <button onClick={() => handleRoleChange(u.id, "user")}>
+                    Make User
+                </button>
+
+                <button onClick={() => handleDeleteUser(u.id)}>
+                    Delete
+                </button>
+                </div>
+            ))}
+            </div>
+        )}
+        </div>
+    );
+    }
+
+    export default AdminDashboard;
 

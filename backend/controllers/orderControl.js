@@ -1,3 +1,4 @@
+
 const db = require('../models/conn');
 
 
@@ -52,44 +53,89 @@ exports.checkout = async (req, res) => {
 
 
 
-    exports.getOrderHistory = async (req, res) => {
+ exports.getOrderHistory = async (req, res) => {
+    const { userId } = req.params;
+  
+    try {
+      if (!userId || userId === "undefined") {
+        return res.status(400).json({ error: "Invalid userId" });
+      }
 
-        const { userId } = req.params; 
-        
-        try {
-            if (!userId || userId === 'undefined') {
-                return res.status(400).json({ error: "User ID parameter is missing or undefined" });
-            }
-    
-            const [orders] = await db.query(
-                `SELECT id, total_price, status, created_at 
-                 FROM orders 
-                 WHERE user_id = ? 
-                 ORDER BY created_at DESC`,
-                [userId] 
-            );
-            
-            res.status(200).json(orders);
-        } catch (error) {
-            res.status(500).json({ error: error.message }); 
+      const [orders] = await db.query( 
+        `
+        SELECT 
+          orders.id,
+          orders.total_price,
+          orders.status,
+          orders.user_id,
+          orders.order_date,
+          products.name AS product_name,
+          order_items.quantity,
+          order_items.price
+        FROM orders
+        LEFT JOIN order_items ON orders.id = order_items.order_id
+        LEFT JOIN products ON order_items.product_id = products.id
+        WHERE orders.user_id = ?
+        ORDER BY orders.id DESC
+        `,
+        [userId]
+      );
+  
+      const grouped = {};
+  
+      orders.forEach((row) => {
+        if (!grouped[row.id]) {
+          grouped[row.id] = {
+            id: row.id,
+            total_price: row.total_price,
+            items: [],
+          };
         }
-    };
+  
+        if (row.product_name) {
+          grouped[row.id].items.push({
+            product_name: row.product_name,
+            quantity: row.quantity,
+            price: row.price,
+          });
+        }
+      });
+  
+      res.json(Object.values(grouped));
+    } catch (error) {
+      console.error("ORDER HISTORY ERROR:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+  exports.getAllOrdersAdmin = async (req, res) => {
+    try {
+      const [orders] = await db.query(`
+        SELECT 
+          o.id,
+          o.user_id,
+          o.total_price,
+          o.status
+        FROM orders o
+        ORDER BY o.id DESC
+      `);
+  
+      res.status(200).json(orders);
+    } catch (error) {
+      console.error("ADMIN ORDERS ERROR:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };
 
-    exports.getAllOrdersAdmin = async (req, res) => {
-        try {
-          const [orders] = await db.query(`
-            SELECT orders.id,
-              users.email,
-              orders.total_price,
-              orders.status,
-              orders.created_at
-            FROM orders
-            JOIN users ON orders.user_id = users.id
-            ORDER BY orders.created_at DESC
-          `);
-      
-          res.status(200).json(orders);
-        } catch (error) {
-          res.status(500).json({ error: error.message });
-        }
-      };
+  exports.updateOrderStatus = async (req, res) => {
+    const { orderId } = req.params;
+    const { status } = req.body;
+    try {
+      await db.query(
+        "UPDATE orders SET status = ? WHERE id = ?",
+        [status, orderId]
+      );
+      res.json({ message: "Status updated" });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };

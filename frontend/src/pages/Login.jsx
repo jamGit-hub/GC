@@ -27,7 +27,7 @@ export default function Login() {
 
           // role-based redirect
           if (data.user?.role === "admin") {
-            navigate("/admin");
+            navigate("/Admin_Dashboard");
           } else {
             navigate("/");
           }
