@@ -17,7 +17,7 @@ function AdminDashboard() {
   const [region, setRegion] = useState("");
 
   const [message, setMessage] = useState("");
-
+  const currentUser = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     fetchProducts();
@@ -226,7 +226,12 @@ function AdminDashboard() {
 
             {users.length === 0 && <p>No users loaded yet</p>}
 
-            {users.map((u) => (
+            <div style={{ marginBottom: "20px", color: "#fff" }}>
+            <p>Admin: {currentUser.username}</p>
+            </div>
+
+            {users.filter(u => u.id !== currentUser.id).map((u) => ( // all users except for current admin
+                
                 <div className="usersInAdminScreen"  
                 key={u.id} style={{borderRadius:"20px", border: "1px solid #ddd", padding: "20px", marginTop:"30px" ,marginLeft: "140px", marginRight:"140px"}}>
                 <h4>{u.username}</h4>
